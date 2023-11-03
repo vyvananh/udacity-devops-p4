@@ -36,7 +36,7 @@ jobs:
       uses: docker/build-push-action@v4
       with:
         context: .
-        dockerfile: ./starter/frontend/Dockerfile
+        dockerfile: ../../starter/frontend/Dockerfile
         push: true
         tags: vyanh/frontend-app:latest
 
