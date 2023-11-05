@@ -8,7 +8,9 @@ on:
 jobs:
   deploy:
     runs-on: ubuntu-latest
-
+    defaults:
+      run:
+        working-directory: ./starter/frontend
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
@@ -16,19 +18,18 @@ jobs:
     - name: Set up Docker Buildx
       uses: docker/setup-buildx-action@v2
 
-    - name: Login to Docker
-      uses: docker/login-action@v2
+    - name: Login to Amazon ECR
+      uses: aws-actions/amazon-ecr-login@v1
       with:
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
+        region: us-east-1
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
 
-    - name: Build and push Docker image
-      uses: docker/build-push-action@v4
-      with:
-        context: .
-        dockerfile: starter/frontend
-        push: true
-        tags: vyanh/frontend-app:latest
+    - name: Build and push ECR image
+      run: |
+          docker build -t udacity-p4 .
+          docker tag udacity-p4:latest 933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4:latest
+          docker push 933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4:latest
 
     # - name: Set up kubectl
     #   uses: azure/setup-kubectl@v2
