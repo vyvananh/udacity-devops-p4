@@ -31,8 +31,10 @@ jobs:
       with:
         mask-password: 'true'
 
-    - name: Build and push ECR image
-      run: echo ${{env.ECR_NAME}}
+    - name: Display environment variables
+      run: |
+        echo "Variable 1: ${{ env.ECR_NAME }}"
+        echo "Variable 2: ${{ env.ECR_REPOSITORY }}"
 
     - name: Build and push ECR image
       run: |
