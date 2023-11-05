@@ -38,12 +38,12 @@ jobs:
         docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
         docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
 
-    # - name: Set up kubectl
-    #   uses: azure/setup-kubectl@v2
-    #   with:
-    #     version: 'latest'
+    - name: Set up kubectl
+      uses: azure/setup-kubectl@v2
+      with:
+        version: 'latest'
 
-    # - name: Deploy to Kubernetes
-    #   run: |
-    #     echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-    #     kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+    - name: Deploy to Kubernetes
+      run: |
+        echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
+        kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
