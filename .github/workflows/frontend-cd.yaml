@@ -33,7 +33,7 @@ jobs:
 
     - name: Display environment variables
       run: |
-        echo "Variable 1: ${{ env.ECR_NAME }}"
+        echo "Variable 1: ${{ secrets.AWS_ACCESS_KEY_ID }}"
         echo "Variable 2: ${{ env.ECR_REPOSITORY }}"
 
     - name: Build and push ECR image
