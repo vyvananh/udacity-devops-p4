@@ -34,7 +34,6 @@ jobs:
     - name: Build and push ECR image
       run: |
         docker build -t ${{vars.ECR_NAME}} .
-        aws ecr batch-delete-image --repository-name ${{vars.ECR_NAME}} --image-ids imageTag=latest
         docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
         docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
 
