@@ -31,16 +31,11 @@ jobs:
       with:
         mask-password: 'true'
 
-    - name: Display environment variables
-      run: |
-        echo "Variable 1: ${{ secrets.AWS_ACCESS_KEY_ID }}"
-        echo "Variable 2: ${{ vars.ECR_REPOSITORY }}"
-
     - name: Build and push ECR image
       run: |
-        docker build -t ${{env.ECR_NAME}} .
-        docker tag ${{env.ECR_NAME}}:latest ${{env.ECR_REPOSITORY}}/${{env.ECR_NAME}}:latest
-        docker push ${{env.ECR_REPOSITORY}}/${{env.ECR_NAME}}:latest
+        docker build -t ${{vars.ECR_NAME}} .
+        docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
+        docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
 
     # - name: Set up kubectl
     #   uses: azure/setup-kubectl@v2
