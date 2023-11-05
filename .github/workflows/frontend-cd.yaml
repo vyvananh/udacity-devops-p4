@@ -34,7 +34,6 @@ jobs:
     - name: Build and push ECR image
       run: |
         docker build -t ${{vars.ECR_NAME}} .
-        docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
         docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
 
     # - name: Set up kubectl
