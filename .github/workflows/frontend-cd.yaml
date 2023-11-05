@@ -33,9 +33,9 @@ jobs:
 
     - name: Build and push ECR image
       run: |
-          docker build -t udacity-p4 .
-          docker tag udacity-p4:latest 933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4:latest
-          docker push 933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4:latest
+          docker build -t $ECR_NAME .
+          docker tag $ECR_NAME:latest $ECR_REPOSITORY/$ECR_NAME:latest
+          docker push 933391749616.dkr.ecr.us-east-1.amazonaws.com/$ECR_NAME:latest
 
     # - name: Set up kubectl
     #   uses: azure/setup-kubectl@v2
