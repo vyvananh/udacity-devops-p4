@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: frontend
+          image: 933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-backend:latest
           ports:
             - containerPort: 3000
