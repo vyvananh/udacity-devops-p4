@@ -37,7 +37,7 @@ jobs:
           docker tag ${{vars.ECR_BACK_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
           docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
 
-          - name: Set up kubectl
+      - name: Set up kubectl
         uses: azure/setup-kubectl@v1
         with:
           version: "latest"
