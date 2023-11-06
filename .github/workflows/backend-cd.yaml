@@ -32,10 +32,19 @@ jobs:
           mask-password: "true"
 
       - name: Build and push ECR image
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t ${{vars.ECR_BACK_NAME}} .
-          docker tag ${{vars.ECR_BACK_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
-          docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
+          docker build -t $REGISTRY/udacity-p4-backend:latest .
+          docker push $REGISTRY/udacity-p4-backend:latest
+
+      - name: Cache Docker image
+        uses: actions/cache@v3
+        with:
+          path: ~/docker-cache
+          key: docker-${{ github.sha }}-backend
+          restore-keys: |
+            docker-${{ github.sha }}-
 
       - name: Set up kubectl
         uses: azure/setup-kubectl@v1
@@ -55,7 +64,7 @@ jobs:
           REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           REPOSITORY: backend
           IMAGE_TAG: latest
-        run: kustomize edit set image backend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-backend:latest
+        run: kustomize edit set image backend=$REGISTRY/udacity-p4-backend:latest
 
       - name: Apply Kubernetes resources
         working-directory: ./starter/backend/k8s

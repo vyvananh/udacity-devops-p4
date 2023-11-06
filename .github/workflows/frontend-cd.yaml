@@ -32,11 +32,21 @@ jobs:
         mask-password: 'true'
 
     - name: Build and push ECR image
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
-        docker build -t ${{vars.ECR_NAME}} .
-        aws ecr batch-delete-image --repository-name ${{vars.ECR_NAME}} --image-ids imageTag=latest
-        docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
-        docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
+        aws eks update-kubeconfig --name cluster
+        export EXTERNALIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer. ingress [0].hostname}{"\n"}{.status.loadBalancer. ingress[0].ip}')
+        docker build -t $REGISTRY/udacity-p4-frontend:latest --build-arg=REACT_APP_MOVIE_API_URL=http://$EXTERNAL_IP .
+        docker push $REGISTRY/udacity-p4-frontend:latest
+
+    - name: Cache Docker image
+      uses: actions/cache@v3
+      with:
+        path: ~/docker-cache
+        key: docker-${{ github.sha }}-frontend
+        restore-keys: |
+          docker-${{ github.sha }}-
 
     - name: Set up kubectl
       uses: azure/setup-kubectl@v1
@@ -54,9 +64,7 @@ jobs:
       working-directory: ./starter/frontend/k8s
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: frontend
-        IMAGE_TAG: latest
-      run: kustomize edit set image frontend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-frontend:latest
+      run: kustomize edit set image frontend=$REGISTRY/udacity-p4-frontend:latest
 
     - name: Apply Kubernetes resources
       working-directory: ./starter/frontend/k8s
