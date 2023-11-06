@@ -46,5 +46,4 @@ jobs:
     - name: Deploy to Kubernetes
       working-directory: ./starter/frontend/k8s
       run: |
-        cat <<< "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-        kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+        kubectl apply -f deployment.yml
