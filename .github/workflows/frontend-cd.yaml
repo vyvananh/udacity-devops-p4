@@ -56,7 +56,7 @@ jobs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         REPOSITORY: backend
         IMAGE_TAG: latest
-      run: kustomize edit set image backend=${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}
+      run: kustomize edit set image backend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-frontend:latest
 
     - name: Apply Kubernetes resources
       working-directory: ./starter/backend/k8s
