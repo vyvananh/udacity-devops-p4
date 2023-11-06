@@ -34,6 +34,7 @@ jobs:
     - name: Build and push ECR image
       run: |
         docker build -t ${{vars.ECR_NAME}} .
+        aws ecr batch-delete-image --repository-name ${{vars.ECR_NAME}} --image-ids imageTag=latest
         docker tag ${{vars.ECR_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
         docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}:latest
 
@@ -43,6 +44,7 @@ jobs:
         version: 'latest'
 
     - name: Deploy to Kubernetes
+      working-directory: ./starter/frontend/k8s
       run: |
         echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
         kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
