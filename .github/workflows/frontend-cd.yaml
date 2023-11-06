@@ -51,13 +51,13 @@ jobs:
       run: ./init.sh || true
 
     - name: Set Docker image in Kustomize
-      working-directory: ./starter/backend/k8s
+      working-directory: ./starter/frontend/k8s
       env:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
-        REPOSITORY: backend
+        REPOSITORY: frontend
         IMAGE_TAG: latest
-      run: kustomize edit set image backend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-frontend:latest
+      run: kustomize edit set image frontend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-frontend:latest
 
     - name: Apply Kubernetes resources
-      working-directory: ./starter/backend/k8s
+      working-directory: ./starter/frontend/k8s
       run: kustomize build | kubectl apply -f -
