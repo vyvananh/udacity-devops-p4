@@ -30,6 +30,10 @@ jobs:
       uses: aws-actions/amazon-ecr-login@v1
       with:
         mask-password: 'true'
+    - name: Build and push ECR image
+      run: |
+        echo $ECR_REPOSITORY
+        echo $ECR_BACK_NAME
 
     - name: Build and push ECR image
       run: |
