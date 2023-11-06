@@ -12,41 +12,51 @@ jobs:
       run:
         working-directory: ./starter/backend
     steps:
-    - name: Checkout repository
-      uses: actions/checkout@v3
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-    - name: Set up Docker Buildx
-      uses: docker/setup-buildx-action@v2
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
 
-    - name: Configure AWS credentials
-      uses: aws-actions/configure-aws-credentials@v1
-      with:
-        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-        aws-region: us-east-1
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v1
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: us-east-1
 
-    - name: Login to Amazon ECR
-      id: login-ecr
-      uses: aws-actions/amazon-ecr-login@v1
-      with:
-        mask-password: 'true'
-    - name: Build and push ECR image
-      run: |
-        echo $ECR_REPOSITORY
-        echo $ECR_BACK_NAME
+      - name: Login to Amazon ECR
+        id: login-ecr
+        uses: aws-actions/amazon-ecr-login@v1
+        with:
+          mask-password: "true"
 
-    - name: Build and push ECR image
-      run: |
-        docker build -t ${{vars.ECR_BACK_NAME}} .
-        docker tag ${{vars.ECR_BACK_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
-        docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
+      - name: Build and push ECR image
+        run: |
+          docker build -t ${{vars.ECR_BACK_NAME}} .
+          docker tag ${{vars.ECR_BACK_NAME}}:latest ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
+          docker push ${{vars.ECR_REPOSITORY}}/${{vars.ECR_BACK_NAME}}:latest
 
-    # - name: Set up kubectl
-    #   uses: azure/setup-kubectl@v2
-    #   with:
-    #     version: 'latest'
+          - name: Set up kubectl
+        uses: azure/setup-kubectl@v1
+        with:
+          version: "latest"
 
-    # - name: Deploy to Kubernetes
-    #   run: |
-    #     echo "${{ secrets.KUBECONFIG }}" > kubeconfig.yaml
-    #     kubectl apply -f deployment.yml --kubeconfig=kubeconfig.yaml
+      - name: Update kubeconfig
+        run: aws eks update-kubeconfig --name cluster
+
+      - name: Run init.sh
+        working-directory: ./setup
+        run: ./init.sh || true
+
+      - name: Set Docker image in Kustomize
+        working-directory: ./starter/backend/k8s
+        env:
+          REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          REPOSITORY: backend
+          IMAGE_TAG: latest
+        run: kustomize edit set image backend=933391749616.dkr.ecr.us-east-1.amazonaws.com/udacity-p4-backend:latest
+
+      - name: Apply Kubernetes resources
+        working-directory: ./starter/backend/k8s
+        run: kustomize build | kubectl apply -f -
