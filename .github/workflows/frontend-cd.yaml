@@ -43,7 +43,21 @@ jobs:
       with:
         version: 'latest'
 
-    - name: Deploy to Kubernetes
-      working-directory: ./starter/frontend/k8s
-      run: |
-        kubectl apply -f kustomization.yml
+    - name: Update kubeconfig
+      run: aws eks update-kubeconfig --name cluster
+
+    - name: Run init.sh
+      working-directory: ./setup
+      run: ./init.sh || true
+
+    - name: Set Docker image in Kustomize
+      working-directory: ./starter/backend/k8s
+      env:
+        REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        REPOSITORY: backend
+        IMAGE_TAG: latest
+      run: kustomize edit set image backend=${{vars.ECR_REPOSITORY}}/${{vars.ECR_NAME}}
+
+    - name: Apply Kubernetes resources
+      working-directory: ./starter/backend/k8s
+      run: kustomize build | kubectl apply -f -
