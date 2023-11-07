@@ -125,7 +125,7 @@ jobs:
         REGISTRY: ${{ steps.login-ecr.outputs.registry }}
       run: |
         aws eks update-kubeconfig --name cluster
-        export EXTERNALIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}{"\n"}{.status.loadBalancer.ingress[0].ip}{"\n"}')
+        export EXTERNALIP=$(kubectl get svc backend -o=jsonpath='{.status.loadBalancer.ingress[0].hostname}{"\n"}{.status.loadBalancer.ingress[0].ip}{"\n"}{"\n"}')
         docker build -t $REGISTRY/udacity-p4-frontend:latest --build-arg=REACT_APP_MOVIE_API_URL=http://$EXTERNALIP .
         docker push $REGISTRY/udacity-p4-frontend:latest
 
