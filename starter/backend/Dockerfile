@@ -1,4 +1,5 @@
 FROM public.ecr.aws/docker/library/python:3.10-alpine
+
 ENV FLASK_RUN_HOST=0.0.0.0
 
 WORKDIR /
@@ -11,14 +12,14 @@ RUN apk update && \
   gcc \
   linux-headers \
   openssl \
-  libffi-dev
-
-RUN python -m pip install --upgrade pip
-RUN pip install pipenv flask_cors flake8
+  libffi-dev \
+  && pip install pipenv
 
 RUN mkdir -p /var/www/app && mkdir /app
 
 COPY Pipfile* /app
+RUN cd /app && pipenv lock --python 3.10  # Update Pipfile.lock
+RUN cd /app && pipenv install --system --deploy
 
 COPY . /app
 
